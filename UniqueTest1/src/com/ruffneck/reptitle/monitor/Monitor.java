@@ -5,7 +5,7 @@ import com.ruffneck.reptitle.info.ExecutorInfo;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * Created by ·ğ½£·ÖËµ on 2015/10/29.
+ * Created by ï¿½ğ½£·ï¿½Ëµ on 2015/10/29.
  */
 public class Monitor implements Runnable {
 
@@ -35,53 +35,77 @@ public class Monitor implements Runnable {
             StringBuilder sb = new StringBuilder();
             try {
 
-                sb.append("[Ê×Ò³ĞÅÏ¢]");
-                if (homePageExecutor.isTerminated()) sb.append("½âÎöÍê±Ï.");
-                else {
-                    sb.append("½âÎöÖĞ....");
-                    sb.append("(" + homePageExecutor.getActiveCount() + "/" + homePageExecutor.getTaskCount() + ")");
+                sb.append("[é¦–é¡µ]");
+                if (homePageExecutor.isTerminated()) {
+                    sb.append("è§£æå®Œæ¯•\n");
+                    articleExecutor.shutdown();
+                } else {
+                    sb.append("è§£æä¸­.......");
+                    sb.append("(" + homePageExecutor.getCompletedTaskCount() + "/" + homePageExecutor.getTaskCount() + ")");
                     sb.append("\n");
-                    sb.append("[Ê×Ò³ĞÅÏ¢]");
-                    sb.append("µ±Ç°½ø¶È:");
-                    sb.append(info.getHomePageInfo());
+//                    sb.append("[ï¿½ï¿½Ò³ï¿½ï¿½Ï¢]");
+//                    sb.append("ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½:");
+//                    sb.append(info.getHomePageInfo());
+/*                    for (int i = 0; i < homePageExecutor.getMaximumPoolSize(); i++) {
+                        String detailInfo = info.getHomePageInfo(i);
+                        if (!StringUtils.isEmpty(detailInfo)) {
+                            sb.append("|--");
+                            sb.append(detailInfo);
+                            sb.append("\n");
+                        }
+                    }*/
                 }
-                sb.append("\n");
+//                sb.append("\n");
 
-                sb.append("[ÎÄÕÂĞÅÏ¢]");
-                if (articleExecutor.isTerminated()) sb.append("½âÎöÍê±Ï.");
-                else {
-                    sb.append("½âÎöÖĞ....");
-                    sb.append("(" + articleExecutor.getActiveCount() + "/" + articleExecutor.getTaskCount() + ")");
+                sb.append("[æ–‡ç« ]");
+                if (articleExecutor.isTerminated()) {
+                    sb.append("è§£æå®Œæ¯•\n");
+                    pictureExecutor.shutdown();
+                } else {
+                    sb.append("è§£æä¸­.......");
+                    sb.append("(" + articleExecutor.getCompletedTaskCount() + "/" + articleExecutor.getTaskCount() + ")");
                     sb.append("\n");
-                    sb.append("[ÎÄÕÂĞÅÏ¢]");
-                    sb.append("µ±Ç°½ø¶È:");
-                    sb.append(info.getArticleInfo());
-                }
-                sb.append("\n");
+/*                    for (int i = 0; i < articleExecutor.getMaximumPoolSize(); i++) {
+                        String detailInfo = info.getArticleInfo(i);
+                        if (!StringUtils.isEmpty(detailInfo)) {
+                            sb.append("|--");
+                            sb.append(detailInfo);
+                            sb.append("\n");
+                        }
+                    }*/
 
-                sb.append("[Í¼Æ¬ĞÅÏ¢]");
-                if (pictureExecutor.isTerminated()) sb.append("½âÎöÍê±Ï.");
+                }
+//                sb.append("\n");
+
+                sb.append("[å›¾ç‰‡]");
+                if (pictureExecutor.isTerminated()) sb.append("è§£æå®Œæ¯•\n");
                 else {
-                    sb.append("½âÎöÖĞ....");
-                    sb.append("(" + pictureExecutor.getActiveCount() + "/" + pictureExecutor.getTaskCount() + ")");
+                    sb.append("è§£æä¸­.......");
+                    sb.append("(" + pictureExecutor.getCompletedTaskCount() + "/" + pictureExecutor.getTaskCount() + ")");
                     sb.append("\n");
-                    sb.append("[ÎÄÕÂĞÅÏ¢]");
-                    sb.append("µ±Ç°½ø¶È:");
-                    sb.append(info.getPictureInfo());
+/*                    for (int i = 0; i < pictureExecutor.getMaximumPoolSize(); i++) {
+                        String detailInfo = info.getPictureInfo(i);
+                        if (!StringUtils.isEmpty(detailInfo)) {
+                            sb.append("|--");
+                            sb.append(detailInfo);
+                            sb.append("\n");
+                        }
+                    }*/
+
+
+                    if (homePageExecutor.isTerminated() && articleExecutor.isTerminated() && pictureExecutor.isTerminated()) {
+                        System.out.println("***********ä»»åŠ¡å®Œæˆäº†!*************");
+                        shutdown();
+                    } else {
+                        System.out.println(sb.toString());
+                    }
+
+                    Thread.sleep(delay);
                 }
-
-
-                //Èç¹û¶¼½âÎöÍê±ÏÁË,¾ÍÍê±ÏÄ£ÄâÆ÷
-                if(homePageExecutor.isTerminated() && articleExecutor.isTerminated() && pictureExecutor.isTerminated()){
-                    System.out.println("***********ËùÓĞÈÎÎñ¶¼Íê³ÉÀ²!*************");
-                }else{
-                    System.out.println(sb.toString());
-                }
-
-                Thread.sleep(delay);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
+
 }

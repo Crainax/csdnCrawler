@@ -1,8 +1,12 @@
 package com.ruffneck.reptitle;
 
+import com.ruffneck.reptitle.exception.ResponseCodeException;
 import com.ruffneck.reptitle.info.ExecutorInfo;
 import com.ruffneck.reptitle.monitor.Monitor;
 import com.ruffneck.reptitle.reject.MyRejectExecutionHandlerImpl;
+import com.ruffneck.reptitle.task.AllArticleTask;
+import com.ruffneck.reptitle.task.ArticleTask;
+import com.ruffneck.reptitle.task.HTMLTask;
 import com.ruffneck.reptitle.utils.BlogConnectionUtils;
 import com.ruffneck.reptitle.utils.ConnectionUtils;
 import com.ruffneck.reptitle.utils.RegexUtils;
@@ -32,22 +36,33 @@ public class Main {
     public static void main(String[] args) throws IOException, SAXException {
         initThreadPool();
 
-//        getAllArticleFromPage(1, REGEX, false);
+//        String url = "http://blog.csdn.net/fansunion/article/details/49531089";
+//        ArticleTask articleTask = new ArticleTask(HTMLTask.JSOUP,false,url,ArticleTask.SPLIT_WAY_PAGRM);
+//        articleExecutor.execute(articleTask);
+//
+        for (int i = 1; i < 6; i++) {
+        AllArticleTask allArticleTask = new AllArticleTask(i, HTMLTask.REGEX, false, articleExecutor, pictureExecutor, info, ArticleTask.SPLIT_TAG);
+            info.addHomePageInfo(allArticleTask);
+            homePageExecutor.execute(allArticleTask);
+        }
 
-        String path = "http://blog.csdn.net/coder_pig/article/details/49474199";
-        getArticle(path,REGEX,false);
+        homePageExecutor.shutdown();
+        //articleExecutor.shutdown();
+        //pictureExecutor.shutdown();
+
+        new Thread(monitor).start();
     }
 
     private static void initThreadPool() {
-        info = new ExecutorInfo();
         MyRejectExecutionHandlerImpl rejectedHandler = new MyRejectExecutionHandlerImpl();
         ThreadFactory threadFactory = Executors.defaultThreadFactory();
         homePageExecutor = new ThreadPoolExecutor(2, 3, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(100),
                 threadFactory, rejectedHandler);
         articleExecutor = new ThreadPoolExecutor(2, 3, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(100),
                 threadFactory, rejectedHandler);
-        pictureExecutor = new ThreadPoolExecutor(2, 3, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000),
+        pictureExecutor = new ThreadPoolExecutor(2, 10, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000),
                 threadFactory, rejectedHandler);
+        info = new ExecutorInfo(homePageExecutor, articleExecutor, pictureExecutor);
         monitor = new Monitor(homePageExecutor, articleExecutor, pictureExecutor, 500, info);
     }
 
@@ -64,7 +79,7 @@ public class Main {
 
     }*/
 
-    public static void getHomePage(int page, int parseWay, boolean isDatas) throws IOException {
+    public static void getHomePage(int page, int parseWay, boolean isDatas) throws IOException, ResponseCodeException {
         String html = ConnectionUtils.connect4String("http://blog.csdn.net/mobile/newest.html", page);
 
         File dir = null;
@@ -108,72 +123,72 @@ public class Main {
 //        Runnable r = new Runnable() {
 //            @Override
 //            public void run() {
-            System.out.println("parsing article:" + path);
-            String html = ConnectionUtils.connect4String(path);
-            ArrayList<HashMap<String, String>> articleList = new ArrayList<>();
+        System.out.println("parsing article:" + path);
+        String html = ConnectionUtils.connect4String(path);
+        ArrayList<HashMap<String, String>> articleList = new ArrayList<>();
 
-            File dir = null;
-            String name = null;
-            if (parseWay == JSOUP) {
-                articleList = BlogConnectionUtils.getBlogContent(path, BlogConnectionUtils.SPLIT_WAY_TAG);
-                name = articleList.get(0).get("article_title").replaceAll("[^\\w\\u4e00-\\u9fa5]", "");
-                dir = new File("articleByJsoup\\" + name);
-            } else if (parseWay == REGEX) {
-                articleList = RegexUtils.parseArticlePage(html);
-                name = articleList.get(0).get("articleTitle").replaceAll("[^\\w\\u4e00-\\u9fa5]", "");
-                dir = new File("articleByRegex\\" + name);
-            }
+        File dir = null;
+        String name = null;
+        if (parseWay == JSOUP) {
+            articleList = BlogConnectionUtils.getBlogContent(path, BlogConnectionUtils.SPLIT_WAY_TAG);
+            name = articleList.get(0).get("article_title").replaceAll("[^\\w\\u4e00-\\u9fa5]", "");
+            dir = new File("articleByJsoup\\" + name);
+        } else if (parseWay == REGEX) {
+            articleList = RegexUtils.parseArticlePage(html);
+            name = articleList.get(0).get("articleTitle").replaceAll("[^\\w\\u4e00-\\u9fa5]", "");
+            dir = new File("articleByRegex\\" + name);
+        }
 
 
-            File file;
-            if (isDatas) {
-                file = new File(dir, name + ".xml");
-                if (!dir.exists()) dir.mkdirs();
-                StreamUtils.writeData(articleList, file);
-            } else {
-                file = new File(dir, name + ".txt");
-                if (!dir.exists()) dir.mkdirs();
-                StreamUtils.writeMap(articleList, file);
-            }
+        File file;
+        if (isDatas) {
+            file = new File(dir, name + ".xml");
+            if (!dir.exists()) dir.mkdirs();
+            StreamUtils.writeData(articleList, file);
+        } else {
+            file = new File(dir, name + ".txt");
+            if (!dir.exists()) dir.mkdirs();
+            StreamUtils.writeMap(articleList, file);
+        }
 
-            if (parseWay == REGEX) {
-                for (HashMap<String, String> map : articleList) {
-                    for (Map.Entry<String, String> entry : map.entrySet()) {
-                        String imageNum = entry.getKey();
-                        String imageURL = entry.getValue();
-                        Matcher matcher = Pattern.compile("image(\\d+)").matcher(imageNum);
-                        if (matcher.find()) {
-                            String imageName = matcher.group(1);
-                            File image = new File(dir, imageName + ".jpg");
-                            ConnectionUtils.connect4File(imageURL, image);
-                        }
-
+        if (parseWay == REGEX) {
+            for (HashMap<String, String> map : articleList) {
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    String imageNum = entry.getKey();
+                    String imageURL = entry.getValue();
+                    Matcher matcher = Pattern.compile("image(\\d+)").matcher(imageNum);
+                    if (matcher.find()) {
+                        String imageName = matcher.group(1);
+                        File image = new File(dir, imageName + ".jpg");
+                        ConnectionUtils.connects4File(imageURL, image);
                     }
+
                 }
-            } else if (parseWay == JSOUP) {
-                for (HashMap<String, String> map : articleList) {
-                    for (Map.Entry<String, String> entry : map.entrySet()) {
-                        String imageNum = entry.getKey();
-                        String imageURL = entry.getValue();
-                        Matcher matcher = Pattern.compile("content(\\d+)_img(\\d+)").matcher(imageNum);
-                        if (matcher.find()) {
-                            String imageName = matcher.group(1) + "_" + matcher.group(2);
-                            File image = new File(dir, imageName + ".jpg");
+            }
+        } else if (parseWay == JSOUP) {
+            for (HashMap<String, String> map : articleList) {
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    String imageNum = entry.getKey();
+                    String imageURL = entry.getValue();
+                    Matcher matcher = Pattern.compile("content(\\d+)_img(\\d+)").matcher(imageNum);
+                    if (matcher.find()) {
+                        String imageName = matcher.group(1) + "_" + matcher.group(2);
+                        File image = new File(dir, imageName + ".jpg");
 //                                    Runnable r2 = new Runnable() {
 //                                        @Override
 //                                        public void run() {
 //                                            try {
-                            ConnectionUtils.connect4File(imageURL, image);
+                        ConnectionUtils.connects4File(imageURL, image);
 //                                            } catch (IOException e) {
 //                                                System.out.println("downloading image:fail!");
 //                                            }
 //                                        }
-                        }
-//                                    pictureExecutor.execute(r2);
                     }
-
+//                                    pictureExecutor.execute(r2);
                 }
+
             }
+        }
 //                } catch (SocketException e){
 //                    System.out.println("parsing article:fail!");
 //                } catch (Exception e){

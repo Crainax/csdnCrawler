@@ -181,7 +181,6 @@ public class StreamUtils {
         XMLHandler xmlHandler = new XMLHandler();
         saxParser.parse(xmlFile, xmlHandler);
         ArrayList<HashMap<String, String>> content = xmlHandler.getContent();
-        System.out.println("content = " + content);
 
         return content;
     }

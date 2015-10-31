@@ -91,11 +91,11 @@ public class BlogConnectionUtils extends ConnectionUtils {
             }
         }
 
-        Element blog_title = document.select("#blog_title > h2 > a").first();
-        datas.put("blog_title", HTMLUtils.getSaveFormat(blog_title.text()));
+        Element blogTitle = document.select("#blog_title > h2 > a").first();
+        datas.put("blogTitle", HTMLUtils.getSaveFormat(blogTitle.text()));
 
-        Element article_title = document.select("#article_details > div.article_title > h1 > span > a").first();
-        datas.put("article_title", HTMLUtils.getSaveFormat(article_title.text()));
+        Element articleTitle = document.select("#article_details > div.article_title > h1 > span > a").first();
+        datas.put("articleTitle", HTMLUtils.getSaveFormat(articleTitle.text()));
 
         //获取这个之后可以用SAXParser去解析行号内容
 //        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("test.html"),"utf-8"));

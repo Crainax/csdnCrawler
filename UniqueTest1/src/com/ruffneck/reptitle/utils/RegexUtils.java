@@ -9,9 +9,9 @@ public class RegexUtils {
 
 
     /**
-     * ÅÀÈ¡csdnÎÄÕÂÖĞµÄÌØ¶¨ÄÚÈİ
+     * ï¿½ï¿½È¡csdnï¿½ï¿½ï¿½ï¿½ï¿½Ğµï¿½ï¿½Ø¶ï¿½ï¿½ï¿½ï¿½ï¿½
      *
-     * @param html ĞèÒª½øĞĞ´¦ÀíµÄhtmlÎÄ¼ş
+     * @param html ï¿½ï¿½Òªï¿½ï¿½ï¿½Ğ´ï¿½ï¿½ï¿½ï¿½htmlï¿½Ä¼ï¿½
      * @return
      */
     public static ArrayList<HashMap<String, String>> parseArticlePage(String html) {
@@ -19,35 +19,34 @@ public class RegexUtils {
         HashMap<String, String> map = new HashMap<>();
 
 
-        //»ñÈ¡²©Ö÷µÄÃû×Ö
+        //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         String authorName = HTMLUtils.getAuthorName(html);
         map.put("authorName", HTMLUtils.getSaveFormat(authorName));
 
-        //»ñÈ¡²©¿ÍµÄ±êÌâ
+        //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ÍµÄ±ï¿½ï¿½ï¿½
         String blogTitle = HTMLUtils.getBlogTitle(html);
         map.put("blogTitle", HTMLUtils.getSaveFormat(blogTitle));
 
-        //»ñÈ¡ÎÄÕÂµÄ±êÌâ
+        //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ÂµÄ±ï¿½ï¿½ï¿½
         String articleTitle = HTMLUtils.getArticleTitle(html);
         map.put("articleTitle", HTMLUtils.getSaveFormat(articleTitle));
 
-        //ÎÄÕÂÄÚÈİµÄÕıÔò,ÕâÀï¿ÉÒÔĞ´ËÀÕâ¸öÕıÔò
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İµï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         //<div id="article_details" class="details">
         //String regex = "<div id=\"article_details\" class=\"details\">(<div(\\s+\\w+=\".*\")*>.*</div>)</div>";
 //        String regex = "<div.*>.*</div>";
 //        String regex = "<div id=\"article_content\" class=\"article_content\">(<div.*>.*</div>)*</div>";
 //        String regex = "<div id=\"article_content\" class=\"article_content\">(.*)<!-- Baidu Button BEGIN -->";
 //        String regex = "<div id=\"article_content\" class=\"article_content\">[^(<!-- Baidu Button BEGIN -->)]*<!-- Baidu Button BEGIN -->";
-        //ÏÂÃæÕâ¸öÕıÔò±í´ïÊ½ÊÇ¿ÉÒÔµÄ,µ«ÊÇ²»Ì«ºÃ.£¬
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½Ç¿ï¿½ï¿½Ôµï¿½,ï¿½ï¿½ï¿½Ç²ï¿½Ì«ï¿½ï¿½.ï¿½ï¿½
 
-        System.out.println("html = " + html);
         String regex = "<div id=\"article_content\" class=\"article_content\">(.*?)(?=</div>\\s*<!-- Baidu Button BEGIN -->)";
         Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
 //        Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(html);
         if (matcher.find()) {
 //            System.out.println("matcher.group() = " + matcher.group());
-            //²¶»ñ×é1ÊÇÎÄÕÂÄÚÈİ.
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
 //            System.out.println("matcher.group() = " + matcher.group(1));
             String content = matcher.group(1);
             String result = HTMLUtils.parseContentHTML(content, map);
@@ -62,9 +61,9 @@ public class RegexUtils {
 
 
     /**
-     * ÅÀÈ¡csdnÊ×Ò³ÖĞµÄÌØ¶¨ÄÚÈİ
+     * ï¿½ï¿½È¡csdnï¿½ï¿½Ò³ï¿½Ğµï¿½ï¿½Ø¶ï¿½ï¿½ï¿½ï¿½ï¿½
      *
-     * @param html ĞèÒª½øĞĞ´¦ÀíµÄhtmlÎÄ¼ş
+     * @param html ï¿½ï¿½Òªï¿½ï¿½ï¿½Ğ´ï¿½ï¿½ï¿½ï¿½htmlï¿½Ä¼ï¿½
      * @return
      */
     public static ArrayList<HashMap<String, String>> parseHomePage(String html) {
@@ -80,15 +79,15 @@ public class RegexUtils {
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(blog_list);
             while (matcher.find()) {
-                //»ñÈ¡Æ¥Åäµ½µÄËùÓĞ±êÇ©
+                //ï¿½ï¿½È¡Æ¥ï¿½äµ½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ±ï¿½Ç©
 //            String resultTag = matcher.group();
-                //»ñµÃÎÄÕÂË÷Òı
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 map.put("name", HTMLUtils.getSaveFormat(matcher.group(1)));
 //            attrSaveMap(map, resultTag, "name");
-                //»ñµÃÎÄÕÂµÄÁ´½Ó
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Âµï¿½ï¿½ï¿½ï¿½ï¿½
                 map.put("href", HTMLUtils.getSaveFormat(matcher.group(2)));
 //            attrSaveMap(map, resultTag, "href");
-                //»ñµÃÎÄÕÂµÄ±êÌâ
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÂµÄ±ï¿½ï¿½ï¿½
                 map.put("title", HTMLUtils.getSaveFormat(matcher.group(3)));
 //            textSaveMap(map,resultTag,"title");
             }
@@ -108,7 +107,7 @@ public class RegexUtils {
             homePageList.add(map);
         }
 
-        //Ê×Ò³µÄÎÄÕÂÕıÔò,±êÌâÓëÁ´½ÓÄÇ¿éÇøÓò
+        //ï¿½ï¿½Ò³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¿ï¿½ï¿½ï¿½ï¿½ï¿½
         return homePageList;
     }
 
@@ -117,13 +116,13 @@ public class RegexUtils {
         return url.substring(index+1);
     }
 
-    //ÒÔÏÂ·½·¨ÍêÈ«¿ÉÒÔÓÃjavaÕıÔòµÄ²¶»ñ×éÈ¥½â¾ö.....
+    //ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½javaï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½È¥ï¿½ï¿½ï¿½.....
 
     /**
-     * ´Ó±êÇ©ÖĞµÄÊôĞÔ´æÈ¡µ½map¼¯ºÏÖĞ.
-     * @param map ĞèÒª´æÈ¡µÄ¼¯ºÏ
-     * @param from ĞèÒª»ñÈ¡Êı¾İµÄÔ´×Ö·û´®
-     * @param regex ĞèÒª»ñÈ¡Êı¾İµÄÕıÔò±í´ïÊ½
+     * ï¿½Ó±ï¿½Ç©ï¿½Ğµï¿½ï¿½ï¿½ï¿½Ô´ï¿½È¡ï¿½ï¿½mapï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
+     * @param map ï¿½ï¿½Òªï¿½ï¿½È¡ï¿½Ä¼ï¿½ï¿½ï¿½
+     * @param from ï¿½ï¿½Òªï¿½ï¿½È¡ï¿½ï¿½ï¿½İµï¿½Ô´ï¿½Ö·ï¿½ï¿½ï¿½
+     * @param regex ï¿½ï¿½Òªï¿½ï¿½È¡ï¿½ï¿½ï¿½İµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½
      */
 /*    private static void attrSaveMap(HashMap<String, String> map, String from, String regex) {
         String result = from.replaceAll(".*" +
@@ -133,13 +132,13 @@ public class RegexUtils {
     }*/
 
     /**
-     * ´Ó±êÇ©ÖĞµÄÎÄ±¾´æÈ¡µ½map¼¯ºÏÖĞ
-     * @param map ĞèÒª´æÈ¡µÄ¼¯ºÏ
-     * @param from ĞèÒª»ñÈ¡Êı¾İµÄÔ´×Ö·û´®
+     * ï¿½Ó±ï¿½Ç©ï¿½Ğµï¿½ï¿½Ä±ï¿½ï¿½ï¿½È¡ï¿½ï¿½mapï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+     * @param map ï¿½ï¿½Òªï¿½ï¿½È¡ï¿½Ä¼ï¿½ï¿½ï¿½
+     * @param from ï¿½ï¿½Òªï¿½ï¿½È¡ï¿½ï¿½ï¿½İµï¿½Ô´ï¿½Ö·ï¿½ï¿½ï¿½
      */
 /*    private static void textSaveMap(HashMap<String, String> map, String from,String textName) {
-        //ÊôĞÔµÄÕıÔò:(\s+\w+=".*")*
-        //Æ¥Åä±êÇ©,²¢»ñÈ¡±êÇ©ÄÚÈİµÄÕıÔò
+        //ï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½ï¿½ï¿½:(\s+\w+=".*")*
+        //Æ¥ï¿½ï¿½ï¿½Ç©,ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½Ç©ï¿½ï¿½ï¿½İµï¿½ï¿½ï¿½ï¿½ï¿½
         String result = from.replaceAll("<(\\w+)(\\s+\\w+=\".*?\")*?>" +
                 "(.*)" +
                 "</\\1>", "$3");

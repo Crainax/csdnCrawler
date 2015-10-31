@@ -1,5 +1,6 @@
 package com.ruffneck.reptitle.utils;
 
+import com.ruffneck.reptitle.exception.ResponseCodeException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -55,7 +56,7 @@ public class ConnectionUtils {
      * @return 该网站的html信息
      * @throws IOException
      */
-    public static String connect4String(String path) throws IOException {
+    public static String connect4String(String path) throws IOException, ResponseCodeException {
         return connect4String(path, 1);
     }
 
@@ -67,7 +68,7 @@ public class ConnectionUtils {
      * @return 该网站的html信息
      * @throws IOException
      */
-    public static String connect4String(String path, int page) throws IOException {
+    public static String connect4String(String path, int page) throws IOException, ResponseCodeException {
 
         String html = null;
         URL url = new URL(path + "?&page=" + page);
@@ -98,20 +99,19 @@ public class ConnectionUtils {
             fos.close();*/
             is.close();
         } else {
-            System.out.println("conn.getResponseCode() = " + conn.getResponseCode());
+//            System.out.println("conn.getResponseCode() = " + conn.getResponseCode());
+            throw new ResponseCodeException(""+conn.getResponseCode());
         }
 
         conn.disconnect();
 
         return html;
     }
-
     /**
      * 访问一个网站,保存内容到文件.
      */
-    public static void connect4File(String path,File file) throws IOException {
-        System.out.println("downloading picture:"+file.getAbsolutePath());
-        if(file.exists())return;
+    public static File connects4File(String path, File file) throws IOException {
+        if(file.exists())return file;
 
         String html = null;
         URL url = new URL(path);
@@ -141,6 +141,7 @@ public class ConnectionUtils {
         }
 
         conn.disconnect();
+        return file;
     }
 
 
